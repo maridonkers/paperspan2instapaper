@@ -1,0 +1,17 @@
+#+TITLE: Paperspan2Instaper
+#+AUTHOR: Mari Donkers
+#+STARTUP: indent
+#+OPTIONS: toc:3
+
+* Introduction
+
+Paperspan HTML export to Instapaper CSV import. With folders.yaml
+configuration file, which contains Instapaper target folder names (for
+output file) and regular expressions for url of text in Paperspan
+export (which is input).
+    
+Usage: see the Makefile.
+
+* Blog article
+
+  Is here: 

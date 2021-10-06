@@ -1,0 +1,39 @@
+name: paperspan2instapaper
+version: 0.0.0.1
+synopsis: Paperspan HTML export to Instapaper CSV import
+description: |
+    Paperspan HTML export to Instapaper CSV import. With folders.yaml
+    configuration file, which contains Instapaper target folder names
+    (for output file) and regular expressions for url of text in
+    Paperspan export (which is input).
+    
+    Usage: see the Makefile.
+category: HTML, CSV
+license: GPL-3
+stability: development
+
+ghc-options:
+- -Wall
+- -fno-warn-unused-do-bind
+- -fno-warn-name-shadowing
+- -fno-warn-missing-signatures
+- -fno-warn-type-defaults
+- -fno-warn-orphans
+
+executables:
+  Paperspan2Instapaper:
+    main: Main.hs
+    source-dirs: app
+    ghc-options: [-threaded]
+    dependencies:
+    - aeson
+    - base
+    - bytestring
+    - conduit
+    - conduit-extra
+    - hxt
+    - optparse-applicative
+    - regex-pcre-builtin
+    - text
+    - yaml
+
