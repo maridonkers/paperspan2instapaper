@@ -14,4 +14,4 @@ Usage: see the Makefile.
 
 * Blog article
 
-  Is here: 
+  Is here: [[https://photonsphere.org/posts/2021-10-06-paperspan2instapaper.html][2021-10-06-paperspan2instapaper]].
