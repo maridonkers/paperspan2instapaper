@@ -14,7 +14,7 @@ Usage: see the [[https://github.com/maridonkers/paperspan2instapaper/blob/master
 Paperspan HTML export to Instapaper CSV import. With [[https://github.com/maridonkers/paperspan2instapaper/blob/master/folders-example.yaml][folders.yaml]]
 configuration file, which contains Instapaper target folder names (for
 output file) and [[https://github.com/niklongstone/regular-expression-cheat-sheet][regular expressions]] for =URL= or =text= in Paperspan
-export (which is input). Each of the selectors in the configuration file (I have thousands) is matched against the URL or text of the Paperspan link being umported, until a match is found and an associated folder can be designated to it. This is very useful when you have a lot of undesignated links in your Paperspan (which you did not already move to a folder in Paperspan).
+export (which is input). Each of the selectors in the configuration file (I have thousands) is matched against the URL or text of the Paperspan link being umported, until a match is found and an associated folder can be designated to it. This is very useful when you have a lot of undesignated links in your Paperspan (which you did not already move to a folder).
 
 e.g. the Paperspan link
 
