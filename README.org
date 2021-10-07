@@ -5,12 +5,41 @@
 
 * Introduction
 
-Paperspan HTML export to Instapaper CSV import. With `folders.yaml`
+Paperspan HTML export to Instapaper CSV import with automatic designation to folders.
+
+Usage: see the [[https://github.com/maridonkers/paperspan2instapaper/blob/master/Makefile][Makefile]].
+
+Paperspan HTML export to Instapaper CSV import. With [[https://github.com/maridonkers/paperspan2instapaper/blob/master/folders-example.yaml][folders.yaml]]
 configuration file, which contains Instapaper target folder names (for
-output file) and /regular expressions/ for `URL` or `text` in Paperspan
-export (which is input). Each of the selectors in the configuration file (I have thousands) is matched against the URL or text of the Paperspan link being umported, until a match is found and a folder can be designated to it.
-    
-Usage: see the Makefile.
+output file) and /regular expressions/ for =URL= or =text= in Paperspan
+export (which is input). Each of the selectors in the configuration file (I have thousands) is matched against the URL or text of the Paperspan link being umported, until a match is found and an associated folder can be designated to it. This is very useful when you have a lot of undesignated links in your Paperspan (which you did not already move to a folder in Paperspan).
+
+e.g. the Paperspan link
+
+#+BEGIN_SRC html
+<a href="https://news360.com/article/563394549" time_added="1630495255000">Stop prescribing hydroxychloroquine for Covid-19, warn researchers | Stop News – India TV</a>
+#+END_SRC
+
+is matched with the following selector from [[https://github.com/maridonkers/paperspan2instapaper/blob/master/folders-example.yaml][folders.yaml]]:
+
+#+BEGIN_SRC yaml
+  - "conditionRegExp": "\\bcovid-19\\b"
+    "conditionSource": "text"
+    "conditionFolderName": "biologyHealth"
+#+END_SRC
+
+which results in designation to the =Biology Health= folder via its folderName (also in [[https://github.com/maridonkers/paperspan2instapaper/blob/master/folders-example.yaml][folders.yaml]]).
+
+#+BEGIN_SRC yaml
+  - "folderName": "biologyHealth"
+    "folderPath": "Biology Health"
+#+END_SRC
+
+and the following CSV line is the result:
+
+#+BEGIN_SRC csv
+  https://news360.com/article/563394549,"Stop prescribing hydroxychloroquine for Covid-19, warn researchers | Stop News – India TV",https://news360.com/article/563394549,"Biology Health",1630495255000
+#+END_SRC
 
 * Blog article
 
