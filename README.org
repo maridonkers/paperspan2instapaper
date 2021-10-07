@@ -9,6 +9,8 @@ Paperspan HTML export to Instapaper CSV import with automatic designation to fol
 
 Usage: see the [[https://github.com/maridonkers/paperspan2instapaper/blob/master/Makefile][Makefile]].
 
+* Automatic designation to folders
+  
 Paperspan HTML export to Instapaper CSV import. With [[https://github.com/maridonkers/paperspan2instapaper/blob/master/folders-example.yaml][folders.yaml]]
 configuration file, which contains Instapaper target folder names (for
 output file) and /regular expressions/ for =URL= or =text= in Paperspan
