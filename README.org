@@ -5,10 +5,10 @@
 
 * Introduction
 
-Paperspan HTML export to Instapaper CSV import. With folders.yaml
+Paperspan HTML export to Instapaper CSV import. With `folders.yaml`
 configuration file, which contains Instapaper target folder names (for
-output file) and regular expressions for url or text in Paperspan
-export (which is input).
+output file) and /regular expressions/ for `URL` or `text` in Paperspan
+export (which is input). Each of the selectors in the configuration file (I have thousands) is matched against the URL or text of the Paperspan link being umported, until a match is found and a folder can be designated to it.
     
 Usage: see the Makefile.
 
