@@ -1,6 +1,12 @@
 # Rename this example file to folders.yaml and change for your usage.
 
 "selectorsConditions":
+  - "conditionRegExp": "\\bb(mathematical|mathematics|mathematician[s]?|data\\s?science)\\b"
+    "conditionSource": "text"
+    "conditionFolderName": "mathematicsDataScience"
+  - "conditionRegExp": "(mathematical|mathematics|mathematician[s]?|data-?science)"
+    "conditionSource": "url"
+    "conditionFolderName": "mathematicsDataScience"
   - "conditionRegExp": "\\b(tele|cell|smart|crypto|fair)?phone[s]?\\b"
     "conditionSource": "text"
     "conditionFolderName": "mobileTelecomAndroidiOS"
@@ -60,3 +66,5 @@
     "folderPath": "Biology Health"
   - "folderName": "mobileTelecomAndroidiOS"
     "folderPath": "Mobile Telecom Android iOS"
+  - "folderName": "mathematicsDataScience"
+    "folderPath": "Mathematics DataScience"
