@@ -20,17 +20,24 @@ ghc-options:
 - -fno-warn-type-defaults
 - -fno-warn-orphans
 
+library:
+  source-dirs: src
+  ghc-options: [-threaded]
+  dependencies:
+    - aeson
+    - base
+    - bytestring
+    - hxt
+    - regex-pcre-builtin
+    - yaml
+
 executables:
   Paperspan2Instapaper:
     main: Main.hs
     source-dirs: app
     ghc-options: [-threaded]
     dependencies:
-    - aeson
     - base
-    - bytestring
-    - hxt
     - optparse-applicative
-    - regex-pcre-builtin
-    - yaml
+    - paperspan2instapaper
 

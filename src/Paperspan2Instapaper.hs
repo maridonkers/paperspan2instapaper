@@ -7,6 +7,7 @@ module Paperspan2Instapaper where
 
 import Data.Aeson.Types
 import qualified Data.Char as C
+import Data.List
 import Data.Yaml
 import GHC.Generics
 import qualified System.IO as I
@@ -108,10 +109,8 @@ processFile' fiPath selectors = do
         putStrLn str
       where
         getFolderPathByName fos fon = do
-          let fos' = filter (\a -> folderName a == fon) fos
-          if null fos'
-            then folderPathDefault
-            else folderPath $ head fos'
+          let fos' = find (\a -> folderName a == fon) fos
+          maybe folderPathDefault folderPath fos'
         timestampStr ts =
           if null ts
             then "0000000000000"
