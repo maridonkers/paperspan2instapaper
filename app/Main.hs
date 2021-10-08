@@ -11,8 +11,8 @@ newtype Args = Args String
 args :: OA.Parser Args
 args =
   Args
-    <$> OA.strOption
-      ( OA.long "input"
+    <$> OA.strArgument
+      ( OA.metavar "HTMLFILE"
           <> OA.help "Input is a Paperspan export file (HTML)."
       )
 
