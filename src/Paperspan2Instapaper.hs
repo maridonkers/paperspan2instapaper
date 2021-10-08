@@ -35,7 +35,7 @@ data Folder = Folder
   { folderName :: FolderName,
     folderPath :: FolderPath
   }
-  deriving (Generic, Read, Show, Eq, FromJSON, ToJSON)
+  deriving (Generic, Read, Show, FromJSON)
 
 folderEmpty :: Folder
 folderEmpty = Folder folderNameEmpty folderPathEmpty
@@ -51,7 +51,7 @@ data Condition = Condition
     conditionSource :: String,
     conditionFolderName :: String
   }
-  deriving (Generic, Read, Show, FromJSON, ToJSON)
+  deriving (Generic, Read, Show, FromJSON)
 
 type Folders = [Folder]
 
@@ -61,22 +61,17 @@ data Selectors = Selectors
   { selectorsFolders :: Folders,
     selectorsConditions :: Conditions
   }
-  deriving (Generic, Read, Show, FromJSON, ToJSON)
+  deriving (Generic, Read, Show, FromJSON)
 
--- processFile :: String -> String -> IO ()
 processFile :: String -> IO ()
--- processFile fiPath foPath = do
 processFile fiPath = do
   (res :: Either ParseException Selectors) <-
     decodeFileEither configFile
   case res of
     Left err -> print err
-    -- Right val -> processFile' fiPath foPath val
     Right val -> processFile' fiPath val
 
--- processFile' :: String -> String -> Selectors -> IO ()
 processFile' :: String -> Selectors -> IO ()
--- processFile' fiPath foPath selectors = do
 processFile' fiPath selectors = do
   let (folders, conditions) =
         ( selectorsFolders selectors,
