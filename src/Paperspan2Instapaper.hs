@@ -18,6 +18,9 @@ import Text.XML.HXT.Core
 configFile :: String
 configFile = "folders.yaml"
 
+timeStampZero :: String
+timeStampZero = "0000000000000"
+
 type FolderName = String
 
 type FolderPath = String
@@ -107,9 +110,7 @@ processFile' fiPath selectors = do
           let fos' = find (\a -> folderName a == fon) fos
           maybe folderPathDefault folderPath fos'
         timestampStr ts =
-          if null ts
-            then "0000000000000"
-            else ts
+          if null ts then timeStampZero else ts
         toLowerString :: [Char] -> [Char]
         toLowerString = map C.toLower
 
