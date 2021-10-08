@@ -8,6 +8,7 @@ module Paperspan2Instapaper where
 import Data.Aeson.Types
 import qualified Data.Char as C
 import Data.List
+import qualified Data.List.Split as S
 import Data.Yaml
 import GHC.Generics
 import qualified System.IO as I
@@ -90,21 +91,34 @@ processFile' fiPath selectors = do
       doc //> hasName "a"
         -- >>> withTraceLevel 5 traceTree
         >>> ( getAttrValue "href"
-                &&& (deep getText `orElse` getAttrValue "href")
-                &&& getAttrValue "time_added"
+                <+> ( listA
+                        ( multi getText
+                            `orElse` getAttrValue "href"
+                        )
+                        >>> arr concat
+                    )
+                <+> getAttrValue "time_added"
             )
   let putStrLnLink = putStrLnLinkFactory folders conditions
-  mapM_ putStrLnLink links
+      partitionedLinks = S.chunksOf 3 links
+  mapM_ putStrLnLink partitionedLinks
   where
     putStrLnLinkFactory folders conditions =
       \link -> do
-        let (url, (txt, ts)) = link
+        let [url, txt, ts] = link
             url' = toLowerString url
-            txt' = toLowerString txt
+            txt' = rstrip $ toLowerString txt
             fon = getFolderNameBySelector url' txt' conditions
             fop = getFolderPathByName folders fon
             ts' = timestampStr ts
-            str = TP.printf "%s,\"%s\",%s,\"%s\",%s" url txt url fop ts'
+            str =
+              TP.printf
+                "%s,\"%s\",%s,\"%s\",%s"
+                url
+                txt
+                url
+                fop
+                ts'
         putStrLn str
       where
         getFolderPathByName fos fon = do
@@ -114,6 +128,8 @@ processFile' fiPath selectors = do
           if null ts then timeStampZero else ts
         toLowerString :: [Char] -> [Char]
         toLowerString = map C.toLower
+        rstrip :: [Char] -> [Char]
+        rstrip = reverse . dropWhile C.isSpace . reverse
 
 getFolderNameBySelector :: String -> String -> Conditions -> FolderName
 getFolderNameBySelector url txt conditions = do

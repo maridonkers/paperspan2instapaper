@@ -29,6 +29,7 @@ library:
     - bytestring
     - hxt
     - regex-pcre-builtin
+    - split
     - yaml
 
 executables:
