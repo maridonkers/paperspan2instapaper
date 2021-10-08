@@ -97,13 +97,13 @@ processFile' fiPath selectors = do
   where
     putStrLnLinkFactory folders conditions =
       \link -> do
-        let (url, (text, timestamp)) = link
+        let (url, (txt, ts)) = link
             url' = toLowerString url
-            text' = toLowerString text
-            fon = getFolderBySelector url' text' conditions
+            txt' = toLowerString txt
+            fon = getFolderBySelector url' txt' conditions
             fop = getFolderPathByName folders fon
-            timestamp' = timestampStr timestamp
-            str = TP.printf "%s,\"%s\",%s,\"%s\",%s" url text url fop timestamp'
+            ts' = timestampStr ts
+            str = TP.printf "%s,\"%s\",%s,\"%s\",%s" url txt url fop ts'
         putStrLn str
       where
         getFolderPathByName fos fon = do
@@ -115,7 +115,7 @@ processFile' fiPath selectors = do
         toLowerString = map C.toLower
 
 getFolderBySelector :: String -> String -> Conditions -> FolderName
-getFolderBySelector url text conditions = do
+getFolderBySelector url txt conditions = do
   getFolderBySelector' conditions
   where
     getFolderBySelector' :: Conditions -> FolderName
@@ -130,7 +130,7 @@ getFolderBySelector url text conditions = do
       | conditionSource c == conditionSourceText = do
         let regExp = conditionRegExp c
             folder = conditionFolderName c
-        if text =~ regExp
+        if txt =~ regExp
           then folder
           else getFolderBySelector' cs
       | otherwise = folderNameEmpty
