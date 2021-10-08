@@ -88,6 +88,7 @@ processFile' fiPath selectors = do
   links <-
     runX $
       doc //> hasName "a"
+        -- >>> withTraceLevel 5 traceTree
         >>> ( getAttrValue "href"
                 &&& (deep getText `orElse` getAttrValue "href")
                 &&& getAttrValue "time_added"
@@ -100,7 +101,7 @@ processFile' fiPath selectors = do
         let (url, (txt, ts)) = link
             url' = toLowerString url
             txt' = toLowerString txt
-            fon = getFolderBySelector url' txt' conditions
+            fon = getFolderNameBySelector url' txt' conditions
             fop = getFolderPathByName folders fon
             ts' = timestampStr ts
             str = TP.printf "%s,\"%s\",%s,\"%s\",%s" url txt url fop ts'
@@ -114,23 +115,23 @@ processFile' fiPath selectors = do
         toLowerString :: [Char] -> [Char]
         toLowerString = map C.toLower
 
-getFolderBySelector :: String -> String -> Conditions -> FolderName
-getFolderBySelector url txt conditions = do
-  getFolderBySelector' conditions
+getFolderNameBySelector :: String -> String -> Conditions -> FolderName
+getFolderNameBySelector url txt conditions = do
+  getFolderNameBySelector' conditions
   where
-    getFolderBySelector' :: Conditions -> FolderName
-    getFolderBySelector' [] = folderNameEmpty
-    getFolderBySelector' (c : cs)
+    getFolderNameBySelector' :: Conditions -> FolderName
+    getFolderNameBySelector' [] = folderNameEmpty
+    getFolderNameBySelector' (c : cs)
       | conditionSource c == conditionSourceUrl = do
         let regExp = conditionRegExp c
             folder = conditionFolderName c
         if url =~ regExp
           then folder
-          else getFolderBySelector' cs
+          else getFolderNameBySelector' cs
       | conditionSource c == conditionSourceText = do
         let regExp = conditionRegExp c
             folder = conditionFolderName c
         if txt =~ regExp
           then folder
-          else getFolderBySelector' cs
+          else getFolderNameBySelector' cs
       | otherwise = folderNameEmpty
