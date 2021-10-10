@@ -88,21 +88,24 @@ processFile' fiPath selectors = do
   let doc = readString [withParseHTML yes, withWarnings no] contents
   links <-
     runX $
-      doc //> hasName "a"
+      doc //> (isElem >>> hasName "a")
         -- >>> withTraceLevel 5 traceTree
         >>> ( getAttrValue "href"
-                <+> ( listA
-                        ( multi getText
-                            `orElse` getAttrValue "href"
-                        )
-                        >>> arr concat
-                    )
+                <+> getAllText
                 <+> getAttrValue "time_added"
             )
   let putStrLnLink = putStrLnLinkFactory folders conditions
       partitionedLinks = S.chunksOf 3 links
   mapM_ putStrLnLink partitionedLinks
   where
+    -- There may be several sub tags with text (e.g. <i>); combine them.
+    getAllText =
+      ( listA
+          ( multi getText
+              `orElse` getAttrValue "href"
+          )
+          >>> arr concat
+      )
     putStrLnLinkFactory folders conditions =
       \link -> do
         let [url, txt, ts] = link
@@ -126,9 +129,7 @@ processFile' fiPath selectors = do
           maybe folderPathDefault folderPath fos'
         timestampStr ts =
           if null ts then timeStampZero else ts
-        toLowerString :: [Char] -> [Char]
         toLowerString = map C.toLower
-        rstrip :: [Char] -> [Char]
         rstrip = reverse . dropWhile C.isSpace . reverse
 
 getFolderNameBySelector :: String -> String -> Conditions -> FolderName
