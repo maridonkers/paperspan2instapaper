@@ -35,6 +35,9 @@ folderPathEmpty = ""
 folderPathDefault :: String
 folderPathDefault = "Paperspan"
 
+folderPaperspanNone :: String
+folderPaperspanNone = "Read Later"
+
 data Folder = Folder
   { folderName :: FolderName,
     folderPath :: FolderPath
@@ -86,16 +89,18 @@ processFile' fiPath selectors = do
   I.hSetEncoding h I.utf8
   contents <- I.hGetContents h
   let doc = readString [withParseHTML yes, withWarnings no] contents
+  -- TODO First get <h2>-tags and jot down Paperspan folder; then process the anchors below subsequent <ul>-tag; repeat.
   links <-
     runX $
       doc //> (isElem >>> hasName "a")
         -- >>> withTraceLevel 5 traceTree
-        >>> ( getAttrValue "href"
-                <+> getAllText
-                <+> getAttrValue "time_added"
-            )
+        >>> catA
+          [ getAttrValue "href",
+            getAllText,
+            getAttrValue "time_added"
+          ]
   let putStrLnLink = putStrLnLinkFactory folders conditions
-      partitionedLinks = S.chunksOf 3 links
+      partitionedLinks = S.chunksOf 3 links -- # should match catA above
   mapM_ putStrLnLink partitionedLinks
   where
     -- There may be several sub tags with text (e.g. <i>); combine them.
@@ -108,7 +113,7 @@ processFile' fiPath selectors = do
       )
     putStrLnLinkFactory folders conditions =
       \link -> do
-        let [url, txt, ts] = link
+        let [url, txt, ts] = link -- # should match catA above
             url' = toLowerString url
             txt' = rstrip $ toLowerString txt
             fon = getFolderNameBySelector url' txt' conditions
