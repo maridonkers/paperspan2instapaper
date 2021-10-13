@@ -93,51 +93,32 @@ processFile' fiPath selectors = do
     runX $
       doc
         //> (isElem >>> hasName "ul")
+          -- TODO Nope, this doesn't work; go for building separate index ahead.
           >>> (getPaperspanFolders &&& getPaperspanAnchors)
   let putStrLnLink = putStrLnLinkFactory folders conditions
       partitionedLinks = S.chunksOf 3 links -- # should match catA above
   mapM_ putStrLnLink partitionedLinks
   where
-    getPaperspanFolders =
-      ( getChildren
-          >>> (isElem >>> hasName "h2")
-      )
-        >>> (deep getText)
-    getPaperspanAnchors =
-      ( getChildren
-          >>> (deep (isElem >>> hasName "a"))
-      )
-        >>> catA
-          [ getAttrValue "href",
-            getAllText,
-            getAttrValue "time_added"
-          ]
-    -- There may be several sub tags with text (e.g. <i>); combine them.
-    getAllText =
-      ( listA
-          ( multi getText
-              `orElse` getAttrValue "href"
-          )
-          >>> arr concat
-      )
     putStrLnLinkFactory folders conditions =
       \link -> do
-        let ([(fol, url), (_, txt), (_, ts)]) = link -- # should match above
+        let ([(fol, url), (folt, txt), (fols, ts)]) = link -- # should match above
             url' = toLowerString url
             txt' = rstrip $ toLowerString txt
-            fon = if fol == folderPaperspanNone
-              then getFolderNameBySelector url' txt' conditions
-              else fol
+            fon =
+              if fol == folderPaperspanNone
+                then getFolderNameBySelector url' txt' conditions
+                else fol
             fop = getFolderPathByName folders fon
             ts' = timestampStr ts
             str =
               TP.printf
-                "%s,\"%s\",%s,\"%s\",%s"
+                "%s,\"%s\",%s,\"%s\",%s *** (%s,%s,%s)"
                 url
                 txt
                 url
                 fop
                 ts'
+                fol folt fols
         putStrLn str
       where
         getFolderPathByName fos fon = do
@@ -147,6 +128,39 @@ processFile' fiPath selectors = do
           if null ts then timeStampZero else ts
         toLowerString = map C.toLower
         rstrip = reverse . dropWhile C.isSpace . reverse
+
+getPaperspanFolders =
+  ( getChildren
+      >>> (isElem >>> hasName "h2")
+  )
+    >>> (deep getText)
+
+getPaperspanAnchors =
+  ( getChildren
+    >>> (isElem >>> hasName "ul")
+  )
+    >>>
+  ( getChildren
+    >>> (isElem >>> hasName "li")
+  )
+    >>>
+  ( getChildren
+      >>> (deep (isElem >>> hasName "a"))
+  )
+    >>> catA
+      [ getAttrValue "href",
+        getAllText,
+        getAttrValue "time_added"
+      ]
+      
+-- There may be several sub tags with text (e.g. <i>); combine them.
+getAllText =
+  ( listA
+      ( multi getText
+          `orElse` getAttrValue "href"
+      )
+      >>> arr concat
+  )
 
 getFolderNameBySelector :: String -> String -> Conditions -> FolderName
 getFolderNameBySelector url txt conditions = do
