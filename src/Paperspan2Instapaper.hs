@@ -89,20 +89,29 @@ processFile' fiPath selectors = do
   I.hSetEncoding h I.utf8
   contents <- I.hGetContents h
   let doc = readString [withParseHTML yes, withWarnings no] contents
-  -- TODO First get <h2>-tags and jot down Paperspan folder; then process the anchors below subsequent <ul>-tag; repeat.
   links <-
     runX $
-      doc //> (isElem >>> hasName "a")
-        -- >>> withTraceLevel 5 traceTree
+      doc
+        //> (isElem >>> hasName "ul")
+          >>> (getPaperspanFolders &&& getPaperspanAnchors)
+  let putStrLnLink = putStrLnLinkFactory folders conditions
+      partitionedLinks = S.chunksOf 3 links -- # should match catA above
+  mapM_ putStrLnLink partitionedLinks
+  where
+    getPaperspanFolders =
+      ( getChildren
+          >>> (isElem >>> hasName "h2")
+      )
+        >>> (deep getText)
+    getPaperspanAnchors =
+      ( getChildren
+          >>> (deep (isElem >>> hasName "a"))
+      )
         >>> catA
           [ getAttrValue "href",
             getAllText,
             getAttrValue "time_added"
           ]
-  let putStrLnLink = putStrLnLinkFactory folders conditions
-      partitionedLinks = S.chunksOf 3 links -- # should match catA above
-  mapM_ putStrLnLink partitionedLinks
-  where
     -- There may be several sub tags with text (e.g. <i>); combine them.
     getAllText =
       ( listA
@@ -113,10 +122,12 @@ processFile' fiPath selectors = do
       )
     putStrLnLinkFactory folders conditions =
       \link -> do
-        let [url, txt, ts] = link -- # should match catA above
+        let ([(fol, url), (_, txt), (_, ts)]) = link -- # should match above
             url' = toLowerString url
             txt' = rstrip $ toLowerString txt
-            fon = getFolderNameBySelector url' txt' conditions
+            fon = if fol == folderPaperspanNone
+              then getFolderNameBySelector url' txt' conditions
+              else fol
             fop = getFolderPathByName folders fon
             ts' = timestampStr ts
             str =

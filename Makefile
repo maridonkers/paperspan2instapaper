@@ -4,6 +4,7 @@
 #
 
 PROJECT="paperspan2instapaper"
+EXECUTABLE="Paperspan2Instapaper"
 
 all: build
 
@@ -29,7 +30,7 @@ repl:
 	cabal new-repl
 
 ls:
-	@cabal list-bin ${PROJECT}
+	@cabal list-bin ${EXECUTABLE}
 
 lint:
 	hlint -v `ag --haskell -l`

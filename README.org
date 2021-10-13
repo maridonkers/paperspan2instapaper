@@ -9,6 +9,28 @@ Paperspan HTML export to Instapaper CSV import with automatic designation to fol
 
 Usage: see the [[https://github.com/maridonkers/paperspan2instapaper/blob/master/Makefile][Makefile]].
 
+* Paperspan format
+#+BEGIN_SRC html
+  <!DOCTYPE html>
+  <html>
+   <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>PaperSpan Export</title>
+   </head>
+   <body>
+    <h1>Unread</h1>
+    <ul>
+     <h2>Read Later</h2>
+     <ul>
+      <li><a href="https://thisisalink" time_added="1630506259000">This is a <i>description</i>.</a></li>
+  ...
+    <h1>Read</h1>
+  <ul>
+   <h2>Read Later</h2>
+   <ul>
+    <li> ...
+#+END_SRC
+
 * Automatic designation to folders
   
 Paperspan HTML export to Instapaper CSV import. With [[https://github.com/maridonkers/paperspan2instapaper/blob/master/folders-example.yaml][folders.yaml]]
