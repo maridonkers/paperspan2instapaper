@@ -5,6 +5,8 @@
 
 module Paperspan2Instapaper where
 
+import Control.Arrow.ArrowList
+-- import Control.Arrow.ArrowNavigatableTree
 import Data.Aeson.Types
 import qualified Data.Char as C
 import Data.List
@@ -89,15 +91,45 @@ processFile' fiPath selectors = do
   I.hSetEncoding h I.utf8
   contents <- I.hGetContents h
   let doc = readString [withParseHTML yes, withWarnings no] contents
-  links <-
+  -- tagsh2 = deep (hasName "h2")
+  -- tagsul = deep (hasName "ul")
+  -- TODO  https://stackoverflow.com/questions/14542260/how-to-merge-sibling-elements-with-same-attributes
+  folderIndex <-
     runX $
       doc
-        //> (isElem >>> hasName "ul")
-          -- TODO Nope, this doesn't work; go for building separate index ahead.
-          >>> (getPaperspanFolders &&& getPaperspanAnchors)
-  let putStrLnLink = putStrLnLinkFactory folders conditions
-      partitionedLinks = S.chunksOf 3 links -- # should match catA above
-  mapM_ putStrLnLink partitionedLinks
+        //> (isElem >>> hasName "body")
+          /> (isElem >>> hasName "ul")
+          /> ( (isElem >>> hasName "h2")
+                 <+> (isElem >>> hasName "ul")
+             )
+        >>> ( (deep getName)
+                &&& ( multi (isElem >>> hasName "a")
+                        >>> (deep getText &&& getAttrValue "href")
+                    )
+            )
+  -- >>> (deep getText)
+  -- >>> (getPaperspanFolders &&& getPaperspanAnchorHashes)
+  -- /> ((isElem >>> hasName "h2")
+  --      /> (isElem >>> hasName "ul"))
+  -- links <-
+  --   runX $
+  --     doc
+  --       /> (isElem >>> hasName "body")
+  --       /> (isElem >>> hasName "ul")
+  --         >>> getPaperspanAnchors
+  -- let putStrLnLink = putStrLnLinkFactory folders conditions
+  --     partitionedLinks = S.chunksOf 3 links -- # should match catA above
+  -- mapM_ putStrLnLink partitionedLinks
+  print folderIndex
+  mapM_
+    ( \folIdx -> do
+        let (tag', (txt', url')) = folIdx
+            -- (url,fol') = inf
+            -- lin = TP.printf "\"%s\" (\"%s\") %s" fol fol' url
+            lin = TP.printf "%s: \"%s\" %s" tag' txt' url'
+        putStrLn lin
+    )
+    folderIndex
   where
     putStrLnLinkFactory folders conditions =
       \link -> do
@@ -118,7 +150,9 @@ processFile' fiPath selectors = do
                 url
                 fop
                 ts'
-                fol folt fols
+                fol
+                folt
+                fols
         putStrLn str
       where
         getFolderPathByName fos fon = do
@@ -129,30 +163,63 @@ processFile' fiPath selectors = do
         toLowerString = map C.toLower
         rstrip = reverse . dropWhile C.isSpace . reverse
 
+{-
 getPaperspanFolders =
   ( getChildren
       >>> (isElem >>> hasName "h2")
+      >>> (deep getText)
   )
-    >>> (deep getText)
 
+getPaperspanFolderAnchors =
+  ( getChildren
+      >>> (isElem >>> hasName "ul")
+      >>> (deep getText)
+  )
+-}
+-- TODO Store in hash table (with hashed URL as key)?
+{-
+getPaperspanFolderAnchorIndex =
+  ( ( getChildren
+        >>> (isElem >>> hasName "h2")
+        >>> (deep getText)
+    )
+    -- TODO &&& DOES NOT WORK (produces cartesian product for all folders); try to combine results in a tuple? See ../hxt-siblings
+  , ( ( getChildren
+                >>> (isElem >>> hasName "ul")
+            )
+              >>> ( getChildren
+                      >>> (isElem >>> hasName "li")
+                  )
+              >>> ( getChildren
+                      >>> (isElem >>> hasName "a")
+                  )
+              >>> getAttrValue "href"
+          )
+  )
+  where
+    -- TODO revise group2 to take [h2,ul] tags to combine into [(h2,ul)].
+    group2 :: [a] -> [(a, a)]
+    group2 [] = []
+    group2 (x0 : x1 : xs) = (x0, x1) : group2 xs
+-}
+
+{-
 getPaperspanAnchors =
   ( getChildren
-    >>> (isElem >>> hasName "ul")
+      >>> (isElem >>> hasName "ul")
   )
-    >>>
-  ( getChildren
-    >>> (isElem >>> hasName "li")
-  )
-    >>>
-  ( getChildren
-      >>> (deep (isElem >>> hasName "a"))
-  )
+    >>> ( getChildren
+            >>> (isElem >>> hasName "li")
+        )
+    >>> ( getChildren
+            >>> (deep (isElem >>> hasName "a"))
+        )
     >>> catA
       [ getAttrValue "href",
         getAllText,
         getAttrValue "time_added"
       ]
-      
+
 -- There may be several sub tags with text (e.g. <i>); combine them.
 getAllText =
   ( listA
@@ -161,6 +228,7 @@ getAllText =
       )
       >>> arr concat
   )
+-}
 
 getFolderNameBySelector :: String -> String -> Conditions -> FolderName
 getFolderNameBySelector url txt conditions = do

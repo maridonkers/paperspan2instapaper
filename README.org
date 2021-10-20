@@ -22,13 +22,20 @@ Usage: see the [[https://github.com/maridonkers/paperspan2instapaper/blob/master
     <ul>
      <h2>Read Later</h2>
      <ul>
-      <li><a href="https://thisisalink" time_added="1630506259000">This is a <i>description</i>.</a></li>
+       <li><a href="https://thisisalink" time_added="1630506259000">This is a <i>description</i>.</a></li>
+       ...
+     </ul>
+    </ul>
   ...
     <h1>Read</h1>
-  <ul>
-   <h2>Read Later</h2>
    <ul>
-    <li> ...
+    <h2>Read Later</h2>
+    <ul>
+      <li> ...</li>
+      ...
+    </ul>
+   </ul>
+  </body>
 #+END_SRC
 
 * Automatic designation to folders
