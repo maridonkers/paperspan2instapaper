@@ -5,7 +5,6 @@
 
 module Paperspan2Instapaper where
 
-import Control.Arrow.ArrowList
 import Data.Aeson.Types
 import qualified Data.Char as C
 import Data.List
