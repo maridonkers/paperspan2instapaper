@@ -80,10 +80,6 @@ processFile fiPath = do
 
 processFile' :: String -> Selectors -> IO ()
 processFile' fiPath selectors = do
-  let (folders, conditions) =
-        ( selectorsFolders selectors,
-          selectorsConditions selectors
-        )
   putStrLn "URL,Title,Selection,Folder,Timestamp"
   h <- I.openFile fiPath I.ReadMode
   I.hSetEncoding h I.utf8
@@ -105,18 +101,22 @@ processFile' fiPath selectors = do
                   ]
             )
   let partitionedLinks = S.chunksOf 3 links -- # should match links above
-  putStrLnLinks folderPaperspanNone folders conditions partitionedLinks
+  putStrLnLinks folderPaperspanNone partitionedLinks
   where
-    putStrLnLinks _ _ _ [] = pure ()
-    putStrLnLinks folder' folders' conditions' (l : ls) = do
+    (folders, conditions) =
+      ( selectorsFolders selectors,
+        selectorsConditions selectors
+      )
+    putStrLnLinks _ [] = pure ()
+    putStrLnLinks folder' (l : ls) = do
       let [(tag, url), (_, txt), (_, ts)] = l
           url' = toLowerString url
           txt' = rstrip $ toLowerString txt
           fop
             | tag == "h2" = txt
             | folder' == folderPaperspanNone =
-              getFolderPathByName folders' $
-                getFolderNameBySelector url' txt' conditions'
+              getFolderPathByName folders $
+                getFolderNameBySelector url' txt' conditions
             | otherwise = folder'
           ts' = timestampStr ts
           str =
@@ -128,7 +128,7 @@ processFile' fiPath selectors = do
               fop
               ts'
       if tag == "a" then putStrLn str else pure ()
-      putStrLnLinks fop folders' conditions' ls
+      putStrLnLinks fop ls
       where
         getFolderPathByName fos fon = do
           let fos' = find (\a -> folderName a == fon) fos
