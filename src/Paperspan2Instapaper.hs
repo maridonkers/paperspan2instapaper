@@ -6,7 +6,6 @@
 module Paperspan2Instapaper where
 
 import Control.Arrow.ArrowList
--- import Control.Arrow.ArrowNavigatableTree
 import Data.Aeson.Types
 import qualified Data.Char as C
 import Data.List
@@ -97,7 +96,7 @@ processFile' fiPath selectors = do
         //> (isElem >>> hasName "body")
           /> (isElem >>> hasName "ul")
           /> ( (isElem >>> hasName "h2")
-                 <+> (multi (isElem >>> hasName "a"))
+                 <+> multi (isElem >>> hasName "a")
              )
         >>> ( getName
                 &&& catA
@@ -106,32 +105,31 @@ processFile' fiPath selectors = do
                     getAttrValue "time_added"
                   ]
             )
-  let putStrLnLink = putStrLnLinkFactory folders conditions
-      partitionedLinks = S.chunksOf 3 links -- # should match catA above
-  mapM_ putStrLnLink partitionedLinks
+  let partitionedLinks = S.chunksOf 3 links -- # should match links above
+  putStrLnLinks folderPaperspanNone folders conditions partitionedLinks
   where
-    -- TODO Recursive function with Paperspan folder passing to output anchors.
-    putStrLnLinkFactory folders conditions =
-      \link -> do
-        let ([(fol, url), (_, txt), (_, ts)]) = link -- # should match above
-            url' = toLowerString url
-            txt' = rstrip $ toLowerString txt
-            fon =
-              if fol == folderPaperspanNone
-                then getFolderNameBySelector url' txt' conditions
-                else fol
-            fop = getFolderPathByName folders fon
-            ts' = timestampStr ts
-            str =
-              TP.printf
-                "%s,\"%s\",%s,\"%s\",%s *** (%s)"
-                url
-                txt
-                url
-                fop
-                ts'
-                fol
-        putStrLn str
+    putStrLnLinks _ _ _ [] = pure ()
+    putStrLnLinks folder' folders' conditions' (l : ls) = do
+      let [(tag, url), (_, txt), (_, ts)] = l
+          url' = toLowerString url
+          txt' = rstrip $ toLowerString txt
+          fop
+            | tag == "h2" = txt
+            | folder' == folderPaperspanNone =
+              getFolderPathByName folders' $
+                getFolderNameBySelector url' txt' conditions'
+            | otherwise = folder'
+          ts' = timestampStr ts
+          str =
+            TP.printf
+              "%s,\"%s\",%s,\"%s\",%s"
+              url
+              txt
+              url
+              fop
+              ts'
+      if tag == "a" then putStrLn str else pure ()
+      putStrLnLinks fop folders' conditions' ls
       where
         getFolderPathByName fos fon = do
           let fos' = find (\a -> folderName a == fon) fos
@@ -143,12 +141,11 @@ processFile' fiPath selectors = do
 
 -- There may be several sub tags with text (e.g. <i>); combine them.
 getAllText =
-  ( listA
-      ( multi getText
-          `orElse` getAttrValue "href"
-      )
-      >>> arr concat
-  )
+  listA
+    ( multi getText
+        `orElse` getAttrValue "href"
+    )
+    >>> arr concat
 
 getFolderNameBySelector :: String -> String -> Conditions -> FolderName
 getFolderNameBySelector url txt conditions = do
