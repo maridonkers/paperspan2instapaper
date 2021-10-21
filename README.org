@@ -38,50 +38,6 @@ Usage: see the [[https://github.com/maridonkers/paperspan2instapaper/blob/master
   </body>
 #+END_SRC
 
-* Output example
-#+BEGIN_SRC haskell
-  h <- I.openFile fiPath I.ReadMode
-  I.hSetEncoding h I.utf8
-  contents <- I.hGetContents h
-  let doc = readString [withParseHTML yes, withWarnings no] contents
-  links <-
-    runX $
-      doc
-        //> (isElem >>> hasName "body")
-          /> (isElem >>> hasName "ul")
-          /> ( (isElem >>> hasName "h2")
-                 <+> (multi (isElem >>> hasName "a"))
-             )
-        >>> ( getName
-                &&& catA
-                  [ getAttrValue "href",
-                    getAllText,
-                    getAttrValue "time_added"
-                  ]
-            )
-  let putStrLnLink = putStrLnLinkFactory folders conditions
-      partitionedLinks = S.chunksOf 3 links -- # should match catA above
-  mapM_
-    putStrLnLink
-    partitionedLinks
-#+END_SRC
-
-#+BEGIN_EXAMPLE
-URL,Title,Selection,Folder,Timestamp
-,"Read Later",,"Paperspan",0000000000000 *** (h2)
-https://www.republicain-lorrain.fr/environnement/2021/07/15/inondations-en-nord-moselle-routes-coupees,"Photos. Inondations en Nord Moselle : plusieurs routes coupées",https://www.republicain-lorrain.fr/environnement/2021/07/15/inondations-en-nord-moselle-routes-coupees,"Paperspan",1630506259000 *** (a)
-https://www.indiatimes.com/technology/news/solar-storms-internet-shutdown-fear-548309.html,"Massive Solar Storms May Shutdown Internet Around The World, Fears Expert",https://www.indiatimes.com/technology/news/solar-storms-internet-shutdown-fear-548309.html,"Paperspan",1630496044000 *** (a)
-https://news360.com/article/563394549,"Stop prescribing hydroxychloroquine for Covid-19, warn researchers | Stop News – India TV",https://news360.com/article/563394549,"Paperspan",1630495255000 *** (a)
-https://news360.com/article/563373075,"Increased Viral Load In Lungs Drives Covid-19 Deaths: Study | Nation",https://news360.com/article/563373075,"Paperspan",1630495227000 *** (a)
-...
-,"Science Technology",,"Paperspan",0000000000000 *** (h2)
-https://www.mathjax.org/static-site-generation-for-researchers-an-interview-with-wonseok-shin/,"Static site generation for researchers an interview with Wonseok Shin | MathJax",https://www.mathjax.org/static-site-generation-for-researchers-an-interview-with-wonseok-shin/,"Paperspan",1604325980000 *** (a)
-https://www.ligo.org/science/Publication-O3aCatalog/,"The science of LSC research",https://www.ligo.org/science/Publication-O3aCatalog/,"Paperspan",1603999166000 *** (a)
-https://phys.org/news/2020-10-discovery-ph-dependent-interaction-pair-protein.html,"Discovery of pH-dependent 'switch' in interaction between pair of protein molecules",https://phys.org/news/2020-10-discovery-ph-dependent-interaction-pair-protein.html,"Paperspan",1603615765000 *** (a)
-https://phys.org/news/2020-10-simple-capture-high-quality-d.html,"Researchers develop simple way to capture high quality 3-D images of live cells and organisms",https://phys.org/news/2020-10-simple-capture-high-quality-d.html,"Paperspan",1603488677000 *** (a)
-...
-#+END_EXAMPLE
-
 * Automatic designation to folders
   
 Paperspan HTML export to Instapaper CSV import. With [[https://github.com/maridonkers/paperspan2instapaper/blob/master/folders-example.yaml][folders.yaml]]
