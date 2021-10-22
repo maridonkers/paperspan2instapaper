@@ -85,6 +85,11 @@ processFile' fiPath selectors = do
   I.hSetEncoding h I.utf8
   contents <- I.hGetContents h
   let doc = readString [withParseHTML yes, withWarnings no] contents
+      anchorFields =
+        [ getAttrValue "href",
+          getAllText,
+          getAttrValue "time_added"
+        ]
   links <-
     runX $
       doc
@@ -94,13 +99,9 @@ processFile' fiPath selectors = do
                  <+> multi (isElem >>> hasName "a")
              )
         >>> ( getName
-                &&& catA
-                  [ getAttrValue "href",
-                    getAllText,
-                    getAttrValue "time_added"
-                  ]
+                &&& catA anchorFields
             )
-  let partitionedLinks = S.chunksOf 3 links -- # should match links above
+  let partitionedLinks = S.chunksOf (length anchorFields) links
   putStrLnLinks folderPaperspanNone partitionedLinks
   where
     (folders, conditions) =
@@ -108,16 +109,16 @@ processFile' fiPath selectors = do
         selectorsConditions selectors
       )
     putStrLnLinks _ [] = pure ()
-    putStrLnLinks folder' (l : ls) = do
+    putStrLnLinks folder (l : ls) = do
       let [(tag, url), (_, txt), (_, ts)] = l
           url' = toLowerString url
           txt' = rstrip $ toLowerString txt
           fop
             | tag == "h2" = txt
-            | folder' == folderPaperspanNone =
+            | folder == folderPaperspanNone =
               getFolderPathByName folders $
                 getFolderNameBySelector url' txt' conditions
-            | otherwise = folder'
+            | otherwise = folder
           ts' = timestampStr ts
           str =
             TP.printf
