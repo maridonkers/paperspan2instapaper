@@ -122,11 +122,10 @@ processFile' fiPath selectors = do
           txt' = rstrip $ toLowerString txt
           folder' = if tag == "h2" then txt else folder
           fop
-            | tag == "h2" = folder'
             | folder == folderPaperspanNone =
               getFolderPathByName folders $
                 getFolderNameBySelector url' txt' conditions
-            | otherwise = folder
+            | otherwise = folder'
           ts' = timestampStr ts
           str = formatStr url txt fop ts'
       if tag == "a" then putStrLn str else pure ()
