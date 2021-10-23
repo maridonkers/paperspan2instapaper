@@ -85,6 +85,13 @@ processFile' fiPath selectors = do
   I.hSetEncoding h I.utf8
   contents <- I.hGetContents h
   let doc = readString [withParseHTML yes, withWarnings no] contents
+      -- There may be several sub tags with text (e.g. <i>); combine them.
+      getAllText =
+        listA
+          ( multi getText
+              `orElse` getAttrValue "href"
+          )
+          >>> arr concat
       anchorFields =
         [ getAttrValue "href",
           getAllText,
@@ -109,27 +116,21 @@ processFile' fiPath selectors = do
         selectorsConditions selectors
       )
     putStrLnLinks _ [] = pure ()
-    putStrLnLinks folder (l : ls) = do
-      let [(tag, url), (_, txt), (_, ts)] = l
+    putStrLnLinks folder (lnk : lnks) = do
+      let [(tag, url), (_, txt), (_, ts)] = lnk
           url' = toLowerString url
           txt' = rstrip $ toLowerString txt
+          folder' = if tag == "h2" then txt else folder
           fop
-            | tag == "h2" = txt
+            | tag == "h2" = folder'
             | folder == folderPaperspanNone =
               getFolderPathByName folders $
                 getFolderNameBySelector url' txt' conditions
             | otherwise = folder
           ts' = timestampStr ts
-          str =
-            TP.printf
-              "%s,\"%s\",%s,\"%s\",%s"
-              url
-              txt
-              url
-              fop
-              ts'
+          str = formatStr url txt fop ts'
       if tag == "a" then putStrLn str else pure ()
-      putStrLnLinks fop ls
+      putStrLnLinks folder' lnks
       where
         getFolderPathByName fos fon = do
           let fos' = find (\a -> folderName a == fon) fos
@@ -138,14 +139,7 @@ processFile' fiPath selectors = do
           if null ts then timeStampZero else ts
         toLowerString = map C.toLower
         rstrip = reverse . dropWhile C.isSpace . reverse
-
--- There may be several sub tags with text (e.g. <i>); combine them.
-getAllText =
-  listA
-    ( multi getText
-        `orElse` getAttrValue "href"
-    )
-    >>> arr concat
+        formatStr u t p s = TP.printf "%s,\"%s\",%s,\"%s\",%s" u t u p s
 
 getFolderNameBySelector :: String -> String -> Conditions -> FolderName
 getFolderNameBySelector url txt conditions = do
