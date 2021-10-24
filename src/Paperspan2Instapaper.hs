@@ -5,6 +5,7 @@
 
 module Paperspan2Instapaper where
 
+import qualified Control.Monad as M
 import Data.Aeson.Types
 import qualified Data.Char as C
 import Data.List
@@ -115,7 +116,7 @@ processFile' fiPath selectors = do
       ( selectorsFolders selectors,
         selectorsConditions selectors
       )
-    putStrLnLinks _ [] = pure ()
+    putStrLnLinks _ [] = return ()
     putStrLnLinks folder (lnk : lnks) = do
       let [(tag, url), (_, txt), (_, ts)] = lnk
           url' = toLowerString url
@@ -128,7 +129,7 @@ processFile' fiPath selectors = do
             | otherwise = folder'
           ts' = timestampStr ts
           str = formatStr url txt fop ts'
-      if tag == "a" then putStrLn str else pure ()
+      M.when (tag == "a") $ putStrLn str
       putStrLnLinks folder' lnks
       where
         getFolderPathByName fos fon = do
