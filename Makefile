@@ -34,3 +34,6 @@ ls:
 
 lint:
 	hlint -v `ag --haskell -l`
+
+ormolu:
+	ormolu -i `ag --haskell -l`
