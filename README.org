@@ -86,3 +86,8 @@ and the following CSV line is the result:
 * Blog article
 
   Is here: [[https://photonsphere.org/posts/2021-10-06-paperspan2instapaper.html][2021-10-06-paperspan2instapaper]].
+  
+* Disclaimer
+This is a 'one shot' program (excuse my Haskell) that I've
+used only once to import an export of my /27,689/ Paperspan article
+links into Instapaper. Update: still /2,140/ undesignated links left; further refining program; adding more selector rules.
