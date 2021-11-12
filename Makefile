@@ -33,7 +33,7 @@ ls:
 	@cabal list-bin ${EXECUTABLE}
 
 lint:
-	hlint -v `ag --haskell -l`
+	ag --haskell -l | xargs hlint -v
 
-ormolu:
-	ormolu -i `ag --haskell -l`
+formatter:
+	ag --haskell -l | xargs brittany --write-mode inplace
