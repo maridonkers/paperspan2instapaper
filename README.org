@@ -9,6 +9,10 @@ Paperspan HTML export to Instapaper CSV import with automatic designation to fol
 
 Usage: see the [[https://github.com/maridonkers/paperspan2instapaper/blob/master/Makefile][Makefile]].
 
+Use a =make shell= before trying a =make build =. A =make ls= lists
+the location of the executable, which you can copy and paste to run
+it.
+
 * Paperspan format
 #+BEGIN_SRC html
   <!DOCTYPE html>

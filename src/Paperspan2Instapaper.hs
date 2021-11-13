@@ -1,19 +1,19 @@
-{-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DeriveAnyClass      #-}
+{-# LANGUAGE DeriveGeneric       #-}
+{-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
 module Paperspan2Instapaper where
 
-import qualified Control.Monad                 as M
+import qualified Control.Monad     as M
 import           Data.Aeson.Types
-import qualified Data.Char                     as C
+import qualified Data.Char         as C
 import           Data.List
-import qualified Data.List.Split               as S
+import qualified Data.List.Split   as S
 import           Data.Yaml
 import           GHC.Generics
-import qualified System.IO                     as I
-import qualified Text.Printf                   as TP
+import qualified System.IO         as I
+import qualified Text.Printf       as TP
 import           Text.Regex.PCRE
 import           Text.XML.HXT.Core
 

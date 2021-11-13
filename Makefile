@@ -6,7 +6,7 @@
 PROJECT="paperspan2instapaper"
 EXECUTABLE="Paperspan2Instapaper"
 
-all: build
+all: help
 
 # Always use `make shell` first, before other commands.
 shell:
@@ -36,4 +36,7 @@ lint:
 	ag --haskell -l | xargs hlint -v
 
 formatter:
-	ag --haskell -l | xargs brittany --write-mode inplace
+	ag --haskell -l | xargs stylish-haskell -i
+
+help:
+	@grep '^[^ 	#:]\+:' Makefile | sed -e 's/:[^:]*//g'

@@ -1,9 +1,9 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
 module Main where
 
-import qualified Options.Applicative           as OA
+import qualified Options.Applicative  as OA
 import           Paperspan2Instapaper
 
 newtype Args = Args String
