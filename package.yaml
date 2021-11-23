@@ -22,7 +22,6 @@ ghc-options:
 
 library:
   source-dirs: src
-  ghc-options: [-threaded]
   dependencies:
     - aeson
     - base
