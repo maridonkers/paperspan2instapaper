@@ -5,7 +5,7 @@
 
 module Paperspan2Instapaper where
 
-import qualified Control.Monad     as M
+import           Control.Monad     (when)
 import           Data.Aeson.Types
 import qualified Data.Char         as C
 import           Data.List
@@ -15,7 +15,7 @@ import           GHC.Generics
 import qualified System.IO         as I
 import qualified Text.Printf       as TP
 import           Text.Regex.PCRE
-import           Text.XML.HXT.Core
+import           Text.XML.HXT.Core hiding (when)
 
 configFile :: String
 configFile = "folders.yaml"
@@ -117,7 +117,7 @@ processFile' fiPath selectors = do
         = folder'
       ts' = timestampStr ts
       str = formatStr url txt fop ts'
-    M.when (tag == "a") $ putStrLn str
+    when (tag == "a") $ putStrLn str
     putStrLnLinks folder' lnks
    where
     getFolderPathByName fos fon = do
