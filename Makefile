@@ -19,9 +19,11 @@ build:
 rebuild:
 	cabal new-clean
 	rm $(PROJECT).cabal
-	cabal new-update
 	hpack
 	cabal new-build
+
+update:
+	cabal new-update
 
 clean:
 	cabal new-clean
