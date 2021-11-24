@@ -1,3 +1,5 @@
 /dist-newstyle/
 /.emacs.desktop
 /.emacs.desktop.lock
+/paperspan2instapaper.cabal
+/folders.yaml
