@@ -44,7 +44,7 @@ it.
 
 
 * Paperspan folders
-  Existing Paperspan folders are taken over by the conversion program. If the =Read Later= folder is encountered then an automatic designation to folders (via regular expression rules, which are provided in a configuration file) is done. See the next section for details on this.
+  Existing Paperspan folders are reused by the conversion program. If the =Read Later= folder is encountered then an automatic designation to folders (via regular expression rules, which are provided in a configuration file) is done. See the next section for details on this.
 
 * Automatic designation to folders
   
